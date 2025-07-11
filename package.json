@@ -1,0 +1,37 @@
+{
+  "name": "resonance-react",
+  "version": "0.0.1",
+  "description": "React components for building read/write websites",
+  "keywords": [
+    "react",
+    "resonance",
+    "cms",
+    "web",
+    "design"
+  ],
+  "license": "MIT",
+  "author": "Steven Foote <steven@resonance.run>",
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "npx tsc -P tsconfig.build.json",
+    "prepack": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "dependencies": {
+    "@resonance-run/resonance-node": "^0.6.1",
+    "dompurify": "^3.2.6",
+    "react": "^19.1.0",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  },
+  "devDependencies": {
+    "@chromatic-com/storybook": "^4.0.0",
+    "@storybook/addon-docs": "^9.0.12",
+    "@storybook/addon-onboarding": "^9.0.12",
+    "@storybook/react-vite": "^9.0.12",
+    "storybook": "^9.0.12"
+  }
+}
