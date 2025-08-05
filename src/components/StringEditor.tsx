@@ -12,8 +12,13 @@ export const StringEditor = ({
   return (
     <input
       type="text"
-      className="resonance-tw-border resonance-tw-border-gray-100 hover:resonance-tw-border-gray-400 focus:resonance-tw-border-gray-600"
-      style={{ background: 'transparent', paddingRight: 4, paddingLeft: 4 }}
+      name={`${contentName}.${attribute}`}
+      style={{
+        background: 'transparent',
+        padding: '4px',
+        border: '1px solid rgba(0,0,0,0.7)',
+        borderRadius: 4,
+      }}
       defaultValue={children as string}
       data-resonance-content-name={contentName}
       data-resonance-content-attribute={attribute}

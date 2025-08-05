@@ -1,3 +1,7 @@
+import { lazy, Suspense, useState } from 'react';
+
+const RichTextEditor = lazy(() => import('./rte/RichTextEditor.js'));
+
 export const MarkupEditor = ({
   children,
   attribute,
@@ -7,19 +11,30 @@ export const MarkupEditor = ({
   attribute: string;
   contentName: string;
 }) => {
-  // Since we don't want to require loading an entire editor library for
-  // users that don't have the ability to actually edit, this editor is
-  // actually just a button that the extension can use to open the actual
-  // editor
+  const [showMarkupEditor, setShowMarkupEditor] = useState(false);
   return (
-    <div
-      data-resonance-markup-editor
-      data-resonance-content-name={contentName}
-      data-resonance-content-attribute={attribute}
-      className="resonance-markup-editor-trigger resonance-tw-border resonance-tw-border-gray-100 hover:resonance-tw-border-gray-400 focus:resonance-tw-border-gray-600"
-      style={{ background: 'transparent', paddingRight: 4, paddingLeft: 4, cursor: 'pointer' }}
-    >
-      {children}
+    <div>
+      <div
+        onClick={() => setShowMarkupEditor(!showMarkupEditor)}
+        data-resonance-markup-editor
+        data-resonance-content-name={contentName}
+        data-resonance-content-attribute={attribute}
+        className="resonance-markup-editor-trigger"
+        style={{
+          background: 'transparent',
+          border: '1px solid rgba(0,0,0,0.7)',
+          padding: '2px 4px',
+          borderRadius: 4,
+          cursor: 'pointer',
+        }}
+      >
+        {children}
+      </div>
+      {showMarkupEditor ? (
+        <Suspense fallback={<div>Loading editor...</div>}>
+          <RichTextEditor name={contentName}>{children}</RichTextEditor>
+        </Suspense>
+      ) : null}
     </div>
   );
 };

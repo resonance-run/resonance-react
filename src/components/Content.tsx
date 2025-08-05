@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { useResonance } from '../context/ResonanceContext.js';
 import sanitizeHtml from 'sanitize-html';
 import { StringEditor } from './StringEditor.js';
@@ -24,8 +24,16 @@ export const Content = ({ children, contentName }: ContentProps): React.ReactNod
 
 export const String = ({ attribute, children }: { attribute: string; children: React.ReactNode }): React.ReactNode => {
   const { content, contentName, isEditorMode } = useContext(ContentContext);
+  const [waited, setWaited] = useState<boolean>(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setWaited(true);
+    }, 500); // Wait for 500 second before rendering
+    return () => clearTimeout(timer);
+  }, []);
   const inner = content[attribute] ? content[attribute] : children;
-  return isEditorMode ? (
+  return isEditorMode && waited ? (
     <StringEditor attribute={attribute} contentName={contentName}>
       {inner}
     </StringEditor>
@@ -36,13 +44,21 @@ export const String = ({ attribute, children }: { attribute: string; children: R
 
 export const Markup = ({ attribute, children }: { attribute: string; children: ReactNode }): React.ReactNode => {
   const { content, isEditorMode, contentName } = useContext(ContentContext);
+  const [waited, setWaited] = useState<boolean>(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setWaited(true);
+    }, 500); // Wait for 500 second before rendering
+    return () => clearTimeout(timer);
+  }, []);
   const markup = content[attribute];
   let inner = children;
   if (typeof markup === 'string') {
     const sanitized = sanitizeHtml(markup);
     inner = <span dangerouslySetInnerHTML={{ __html: sanitized }} />;
   }
-  return isEditorMode ? (
+  return isEditorMode && waited ? (
     <MarkupEditor attribute={attribute} contentName={contentName}>
       {inner}
     </MarkupEditor>
