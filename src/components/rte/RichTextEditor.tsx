@@ -13,13 +13,14 @@ import { ReactNode, useRef, useState } from 'react';
 import FloatingLinkEditorPlugin from './plugins/FloatingLinkEditorPlugin.js';
 import { InitialStatePlugin } from './plugins/InitialStatePlugin.js';
 import { ToolbarPlugin } from './plugins/ToolbarPlugin.js';
+import { $generateHtmlFromNodes } from '@lexical/html';
 
 interface RichTextEditorProps {
   name: string;
   defaultValue?: string;
   errorMessage?: string;
   children?: ReactNode;
-  onChange?: (value: SerializedEditorState) => void;
+  onChange?: ({ value, html }: { value: SerializedEditorState; html: string }) => void;
 }
 
 const theme: EditorThemeClasses = {
@@ -99,9 +100,15 @@ export const RichTextEditor = ({ defaultValue = '', name, children, onChange }: 
         <HistoryPlugin />
         <LinkPlugin />
         <OnChangePlugin
-          onChange={editorState => {
+          onChange={(editorState, editor) => {
+            editor.update(
+              () => {
+                const html = $generateHtmlFromNodes(editor);
+                onChange?.({ html, value: editorState.toJSON() });
+              },
+              { discrete: true }
+            );
             setEditorValue(JSON.stringify(editorState.toJSON()));
-            onChange?.(editorState.toJSON());
           }}
         />
         {floatingAnchorElem ? (
