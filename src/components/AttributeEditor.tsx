@@ -8,8 +8,6 @@ interface AttributeEditorProps {
 }
 export const AttributeEditor = ({ renderValues, setRenderValues, attributes }: AttributeEditorProps) => {
   const saveAttr = (key, val) => {
-    console.log(renderValues);
-    console.log('setting', key, val);
     setRenderValues({
       ...renderValues,
       [key]: val,
