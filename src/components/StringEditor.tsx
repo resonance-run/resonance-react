@@ -13,11 +13,10 @@ export const StringEditor = ({
     <input
       type="text"
       name={`${contentName}.${attribute}`}
+      className="restw:p-2! restw:rounded-md! restw:w-full!"
       style={{
         background: 'transparent',
-        padding: '4px',
         border: '1px solid rgba(0,0,0,0.7)',
-        borderRadius: 4,
       }}
       defaultValue={children as string}
       data-resonance-content-name={contentName}

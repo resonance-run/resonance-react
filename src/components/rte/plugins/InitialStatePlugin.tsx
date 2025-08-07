@@ -10,7 +10,6 @@ export const InitialStatePlugin = ({ defaultValue, children }: { defaultValue: s
 
   useEffect(() => {
     if (isFirstRender) {
-      console.log('first render');
       try {
         // If valid JSON, parse it to create the initial state
         const initialState = editor.parseEditorState(defaultValue);
@@ -24,7 +23,6 @@ export const InitialStatePlugin = ({ defaultValue, children }: { defaultValue: s
           const parser = new DOMParser();
           const dom = parser.parseFromString(initialStateRef.current.innerHTML, 'text/html');
           const nodes = $generateNodesFromDOM(editor, dom);
-          console.log('GENERATED NODES', nodes);
           const root = $getRoot();
           root.clear();
           root.append(...nodes);
