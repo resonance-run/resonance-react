@@ -4,15 +4,19 @@ export const StringEditor = ({
   children,
   attribute,
   contentName,
+  isPreviewMode,
 }: {
   attribute: string;
   contentName: string;
   children: ReactNode;
+  isPreviewMode: boolean;
 }) => {
-  return (
+  return isPreviewMode ? (
+    children
+  ) : (
     <input
       type="text"
-      name={`${contentName}.${attribute}`}
+      name={attribute}
       className="restw:p-2! restw:rounded-md! restw:w-full!"
       style={{
         background: 'transparent',

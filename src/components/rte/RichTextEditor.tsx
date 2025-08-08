@@ -7,7 +7,7 @@ import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
-import { type EditorThemeClasses, type SerializedEditorState } from 'lexical';
+import { EditorState, LexicalEditor, type EditorThemeClasses, type SerializedEditorState } from 'lexical';
 import { ReactNode, useRef, useState } from 'react';
 
 import FloatingLinkEditorPlugin from './plugins/FloatingLinkEditorPlugin.js';
@@ -66,6 +66,10 @@ export const RichTextEditor = ({ defaultValue = '', name, children, onChange }: 
     onError,
     nodes: [LinkNode, HeadingNode, QuoteNode],
   };
+  const save = (editorState: EditorState, editor: LexicalEditor) => {
+    const html = $generateHtmlFromNodes(editor);
+    onChange?.({ html, value: editorState.toJSON() });
+  };
 
   return (
     <div className="lexical-editor restw:relative! restw:rounded-lg! restw:border! restw:border-gray-300">
@@ -74,7 +78,9 @@ export const RichTextEditor = ({ defaultValue = '', name, children, onChange }: 
           ...initialConfig,
         }}
       >
-        <InitialStatePlugin defaultValue={defaultValue}>{children}</InitialStatePlugin>
+        <InitialStatePlugin defaultValue={defaultValue} onSetInitialSate={save}>
+          {children}
+        </InitialStatePlugin>
         <ToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
         <div ref={onRef} className="restw:relative!">
           <RichTextPlugin
@@ -101,13 +107,7 @@ export const RichTextEditor = ({ defaultValue = '', name, children, onChange }: 
         <LinkPlugin />
         <OnChangePlugin
           onChange={(editorState, editor) => {
-            editor.update(
-              () => {
-                const html = $generateHtmlFromNodes(editor);
-                onChange?.({ html, value: editorState.toJSON() });
-              },
-              { discrete: true }
-            );
+            editor.update(() => save(editorState, editor), { discrete: true });
             setEditorValue(JSON.stringify(editorState.toJSON()));
           }}
         />
@@ -115,7 +115,6 @@ export const RichTextEditor = ({ defaultValue = '', name, children, onChange }: 
           <FloatingLinkEditorPlugin isLinkEditMode={isLinkEditMode} setIsLinkEditMode={setIsLinkEditMode} />
         ) : null}
       </LexicalComposer>
-      <input type="hidden" name={name} value={editorValue} />
     </div>
   );
 };

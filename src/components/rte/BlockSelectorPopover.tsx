@@ -51,7 +51,7 @@ export const BlockSelectorPopover = ({ editor, blockType }: BlockSelectorPopover
   const [open, setOpen] = useState<boolean>(false);
   const IconComponent = blockTypeToIcon[blockType] ?? Text;
   const blockTrigger = (
-    <div className="flex items-center gap-2">
+    <div className="restw:flex! restw:items-center! restw:gap-2!">
       <IconComponent />
       <span>{blockType ? blockTypeToBlockName[blockType] : 'Normal'}</span>
     </div>
@@ -60,16 +60,16 @@ export const BlockSelectorPopover = ({ editor, blockType }: BlockSelectorPopover
   return (
     <Popover placement="bottom-start" open={open} onOpenChange={setOpen}>
       <PopoverTrigger
-        className="flex cursor-pointer items-center gap-2 rounded-sm p-1 hover:bg-gray-100"
+        className="restw:flex! restw:cursor-pointer! restw:items-center! restw:gap-2! restw:rounded-sm! restw:p-1! restw:hover:bg-gray-100!"
         onClick={() => setOpen(!open)}
       >
         {blockTrigger}
       </PopoverTrigger>
       <PopoverContent>
-        <ul className="flex flex-col gap-1 bg-white shadow-md">
+        <ul className="restw:flex! restw:flex-col! restw:gap-1! restw:bg-white! restw:shadow-md!">
           <li>
             <button
-              className="items center flex w-full flex-row gap-2 p-2 text-left hover:bg-gray-100"
+              className="restw:items-center! restw:flex! restw:w-full! restw:flex-row! restw:gap-2! restw:p-2! restw:text-left! restw:hover:bg-gray-100!"
               onClick={() => {
                 editor.update(() => {
                   const selection = $getSelection();
@@ -87,7 +87,7 @@ export const BlockSelectorPopover = ({ editor, blockType }: BlockSelectorPopover
           ))}
           <li>
             <button
-              className="items center flex w-full flex-row gap-2 p-2 text-left hover:bg-gray-100"
+              className="restw:items-center! restw:flex! restw:w-full! restw:flex-row! restw:gap-2 restw:p-2! restw:text-left! restw:hover:bg-gray-100!"
               onClick={() => {
                 editor.update(() => {
                   const selection = $getSelection();
@@ -119,7 +119,7 @@ const HeadingOption = ({
   return (
     <li>
       <button
-        className="items center flex w-full flex-row gap-2 p-2 text-left hover:bg-gray-100"
+        className="restw:items-center! restw:flex! restw:w-full! restw:flex-row! restw:gap-2! restw:p-2! restw:text-left! restw:hover:bg-gray-100!"
         onClick={() => {
           formatHeading(editor, 'heading', level);
           setOpen(false);

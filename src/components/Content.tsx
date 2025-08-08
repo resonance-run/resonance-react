@@ -1,9 +1,10 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { createContext, FormEvent, MouseEvent, ReactNode, useContext, useEffect, useState } from 'react';
 import { useResonance } from '../context/ResonanceContext.js';
 import sanitizeHtml from 'sanitize-html';
 import { StringEditor } from './StringEditor.js';
 import { MarkupEditor } from './MarkupEditor.js';
 import { AttributeEditor } from './AttributeEditor.js';
+import { Button } from './common/Button.js';
 
 type ContentProps = {
   children: ReactNode;
@@ -13,18 +14,60 @@ type ContentProps = {
 const ContentContext = createContext<{
   content: Record<string, string | number | boolean>;
   isEditorMode: boolean;
+  isPreviewMode: boolean;
   contentName: string;
-}>({ content: {}, isEditorMode: false, contentName: '' });
+}>({ content: {}, isEditorMode: false, isPreviewMode: false, contentName: '' });
 
 export const Content = ({ children, contentName }: ContentProps): React.ReactNode => {
   const context = useResonance();
-  const content = context.contentValues[contentName] ?? {};
-  const isEditorMode = context.isEditorMode;
-  return <ContentContext.Provider value={{ content, isEditorMode, contentName }}>{children}</ContentContext.Provider>;
+  const [content, setContent] = useState<Record<string, string | number | boolean>>(
+    context.contentValues[contentName] ?? {}
+  );
+  const [isEditorMode, setIsEditorMode] = useState<boolean>(context.isEditorMode);
+  const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
+  const [hasChange, setHasChange] = useState<boolean>(false);
+  const preview = (e: MouseEvent<HTMLButtonElement>) => {
+    const button = e.target as HTMLButtonElement;
+    const form = button.form;
+    const formData = new FormData(form);
+    const previewData = Array.from(formData.entries()).reduce((res: Record<string, string>, [name, val]) => {
+      res[name] = val.toString();
+      return res;
+    }, {});
+    const update = {
+      ...content,
+      ...previewData,
+    };
+    setContent(update);
+    setIsPreviewMode(true);
+  };
+  return (
+    <ContentContext.Provider value={{ content, isEditorMode, isPreviewMode, contentName }}>
+      {isEditorMode ? (
+        <form data-resonance-content-form={contentName} onChange={() => setHasChange(true)}>
+          {children}
+          {hasChange ? (
+            <div className="restw:fixed! restw:flex! restw:items-center! restw:justify-center! restw:top-0! restw:z-50! restw:w-screen! restw:h-16! restw:bg-white! restw:shadow-md!">
+              <div className="restw:flex! restw:gap-2!">
+                <Button type="button" onClick={() => console.log('publish')}>
+                  Publish
+                </Button>
+                <Button type="button" onClick={preview}>
+                  Preview
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </form>
+      ) : (
+        children
+      )}
+    </ContentContext.Provider>
+  );
 };
 
 export const String = ({ attribute, children }: { attribute: string; children: React.ReactNode }): React.ReactNode => {
-  const { content, contentName, isEditorMode } = useContext(ContentContext);
+  const { content, contentName, isEditorMode, isPreviewMode } = useContext(ContentContext);
   const [waited, setWaited] = useState<boolean>(false);
 
   useEffect(() => {
@@ -35,7 +78,7 @@ export const String = ({ attribute, children }: { attribute: string; children: R
   }, []);
   const inner = content[attribute] ? content[attribute] : children;
   return isEditorMode && waited ? (
-    <StringEditor attribute={attribute} contentName={contentName}>
+    <StringEditor attribute={attribute} contentName={contentName} isPreviewMode={isPreviewMode}>
       {inner}
     </StringEditor>
   ) : (
@@ -44,7 +87,7 @@ export const String = ({ attribute, children }: { attribute: string; children: R
 };
 
 export const Markup = ({ attribute, children }: { attribute: string; children: ReactNode }): React.ReactNode => {
-  const { content, isEditorMode, contentName } = useContext(ContentContext);
+  const { content, isEditorMode, contentName, isPreviewMode } = useContext(ContentContext);
   const [waited, setWaited] = useState<boolean>(false);
   const [markup, setMarkup] = useState(content[attribute] ?? undefined);
   const [inner, setInner] = useState(children);
@@ -63,7 +106,12 @@ export const Markup = ({ attribute, children }: { attribute: string; children: R
   }, [markup]);
 
   return isEditorMode && waited ? (
-    <MarkupEditor attribute={attribute} contentName={contentName} updateMarkup={setMarkup}>
+    <MarkupEditor
+      attribute={attribute}
+      contentName={contentName}
+      updateMarkup={setMarkup}
+      isPreviewMode={isPreviewMode}
+    >
       {inner}
     </MarkupEditor>
   ) : (
@@ -90,12 +138,13 @@ export const Attributes = ({
   }, {} as Record<string, string>);
   const [renderValues, setRenderValues] = useState<Record<string, string>>(values);
   const isEditorMode = context.isEditorMode;
+  const isPreviewMode = context.isPreviewMode;
 
   return (
     <>
       {children(renderValues)}
-      {isEditorMode ? (
-        <AttributeEditor renderValues={renderValues} setRenderValues={setRenderValues} attributes={attributes} />
+      {isEditorMode && !isPreviewMode ? (
+        <AttributeEditor renderValues={renderValues} setRenderValues={setRenderValues} />
       ) : null}
     </>
   );
