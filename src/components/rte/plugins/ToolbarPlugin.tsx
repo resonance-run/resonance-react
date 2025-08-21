@@ -150,7 +150,7 @@ export const ToolbarPlugin = ({ setIsLinkEditMode }: { setIsLinkEditMode: Dispat
   return (
     <div
       ref={toolbarRef}
-      className="restw:flex! restw:h-12! restw:items-center! restw:gap-2! restw:border-b! restw:border-gray-300! restw:bg-white! restw:p-2!"
+      className="restw:flex! restw:h-12! restw:items-center! restw:gap-2! restw:border-b! restw:border-gray-300! restw:bg-white! restw:p-2! restw:text-black/90!"
     >
       <BlockSelectorPopover editor={editor} blockType={blockType} />
       <ToolbarButton

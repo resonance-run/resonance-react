@@ -26,6 +26,7 @@ export const Content = ({ children, contentName }: ContentProps): React.ReactNod
   const [isEditorMode, setIsEditorMode] = useState<boolean>(context.isEditorMode);
   const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
   const [hasChange, setHasChange] = useState<boolean>(false);
+  const [isPublishing, setIsPublishing] = useState<boolean>(false);
   const preview = (e: MouseEvent<HTMLButtonElement>) => {
     const button = e.target as HTMLButtonElement;
     const form = button.form;
@@ -41,6 +42,40 @@ export const Content = ({ children, contentName }: ContentProps): React.ReactNod
     setContent(update);
     setIsPreviewMode(true);
   };
+
+  const publish = (e: MouseEvent<HTMLButtonElement>) => {
+    setIsPublishing(true);
+    const button = e.target as HTMLButtonElement;
+    const form = button.form;
+    const formData = new FormData(form);
+    const data = Array.from(formData.entries()).reduce((res: Record<string, string>, [name, val]) => {
+      res[name] = val.toString();
+      return res;
+    }, {});
+    const publishEvent = {
+      type: 'resonance-publish',
+      customizationTypeId: contentName,
+      formData: data,
+    };
+    console.log('dispatching event', publishEvent);
+    window.postMessage(publishEvent);
+  };
+
+  useEffect(() => {
+    window.addEventListener('message', (event: MessageEvent<{ type: string }>) => {
+      if (event.origin !== window.location.origin) {
+        return;
+      }
+      if (event.data.type === 'resonance-extension-publish-success') {
+        console.log('Publish successful');
+        setIsPublishing(false);
+        setIsPreviewMode(false);
+        setHasChange(false);
+      }
+    });
+  }, []);
+
+  const disabledButtons = isPublishing;
   return (
     <ContentContext.Provider value={{ content, isEditorMode, isPreviewMode, contentName }}>
       {isEditorMode ? (
@@ -49,11 +84,11 @@ export const Content = ({ children, contentName }: ContentProps): React.ReactNod
           {hasChange ? (
             <div className="restw:fixed! restw:flex! restw:items-center! restw:justify-center! restw:top-0! restw:z-50! restw:w-screen! restw:h-16! restw:bg-white! restw:shadow-md!">
               <div className="restw:flex! restw:gap-2!">
-                <Button type="button" onClick={() => console.log('publish')}>
-                  Publish
+                <Button type="button" onClick={publish} disabled={disabledButtons}>
+                  {disabledButtons ? 'DISABLED' : null} Publish
                 </Button>
-                <Button type="button" onClick={preview}>
-                  Preview
+                <Button type="button" onClick={preview} disabled={disabledButtons}>
+                  {disabledButtons ? 'DISABLED' : null} Preview
                 </Button>
               </div>
             </div>
@@ -119,8 +154,9 @@ export const Markup = ({ attribute, children }: { attribute: string; children: R
   );
 };
 
+export type AttributeType = 'RawString' | 'Number' | 'Image' | 'Url' | 'Color';
 export type AttributeDetails = {
-  type: 'RawString' | 'Number' | 'Image' | 'Url' | 'Color';
+  type: AttributeType;
   value: string;
 };
 export const Attributes = ({

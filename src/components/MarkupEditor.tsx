@@ -1,5 +1,7 @@
 import { SerializedEditorState } from 'lexical';
 import { lazy, Suspense, useRef, useState } from 'react';
+import { v4 as uuidV4 } from 'uuid';
+
 import { Button } from './common/Button.js';
 
 const RichTextEditor = lazy(() => import('./rte/RichTextEditor.js'));
@@ -62,7 +64,17 @@ export const MarkupEditor = ({
         </Suspense>
       )}
       {editorState?.value ? (
-        <input ref={hiddenInputRef} type="hidden" name={attribute} value={JSON.stringify(editorState.value)} />
+        <>
+          <input
+            ref={hiddenInputRef}
+            type="hidden"
+            name={`${attribute}.value`}
+            value={JSON.stringify(editorState.value)}
+          />
+          <input type="hidden" name={`${attribute}.name`} value={attribute} />
+          <input type="hidden" name={`${attribute}.id`} value={uuidV4()} />
+          <input type="hidden" name={`${attribute}.type`} value="Copy" />
+        </>
       ) : null}
     </div>
   );
