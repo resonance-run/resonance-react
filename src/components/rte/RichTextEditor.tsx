@@ -33,7 +33,7 @@ const theme: EditorThemeClasses = {
     underlineStrikethrough: 'restw:line-through!',
     code: 'restw:bg-gray-100! restw:px-1! restw:rounded-sm! restw:font-mono!',
   },
-  link: 'restw:text-blue-500!',
+  link: 'restw:underline!',
   quote: 'restw:border-l-4! restw:border-gray-300! restw:pl-4! restw:text-black/70! restw:my-2!',
   heading: {
     h1: 'restw:font-semibold! restw:text-3xl! restw:mb-2!',
@@ -86,7 +86,7 @@ export const RichTextEditor = ({ defaultValue = '', name, children, onChange }: 
           <RichTextPlugin
             contentEditable={
               <ContentEditable
-                className="restw:p-4! restw:text-black/90!"
+                className="restw:p-4!"
                 aria-placeholder={'Enter some text...'}
                 data-testid={`${name}-editor`}
                 ref={contentEditableRef}
