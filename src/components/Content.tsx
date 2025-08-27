@@ -28,6 +28,10 @@ export const Content = ({ children, contentName }: ContentProps): React.ReactNod
   const [hasChange, setHasChange] = useState<boolean>(false);
   const [isPublishing, setIsPublishing] = useState<boolean>(false);
   const preview = (e: MouseEvent<HTMLButtonElement>) => {
+    if (isPreviewMode) {
+      setIsPreviewMode(false);
+      return;
+    }
     const button = e.target as HTMLButtonElement;
     const form = button.form;
     const formData = new FormData(form);
@@ -57,7 +61,6 @@ export const Content = ({ children, contentName }: ContentProps): React.ReactNod
       customizationTypeId: contentName,
       formData: data,
     };
-    console.log('dispatching event', publishEvent);
     window.postMessage(publishEvent);
   };
 
@@ -67,7 +70,6 @@ export const Content = ({ children, contentName }: ContentProps): React.ReactNod
         return;
       }
       if (event.data.type === 'resonance-extension-publish-success') {
-        console.log('Publish successful');
         setIsPublishing(false);
         setIsPreviewMode(false);
         setHasChange(false);
@@ -85,10 +87,10 @@ export const Content = ({ children, contentName }: ContentProps): React.ReactNod
             <div className="restw:fixed! restw:flex! restw:items-center! restw:justify-center! restw:top-0! restw:z-50! restw:w-screen! restw:h-16! restw:bg-white! restw:shadow-md!">
               <div className="restw:flex! restw:gap-2!">
                 <Button type="button" onClick={publish} disabled={disabledButtons}>
-                  {disabledButtons ? 'DISABLED' : null} Publish
+                  Publish
                 </Button>
                 <Button type="button" onClick={preview} disabled={disabledButtons}>
-                  {disabledButtons ? 'DISABLED' : null} Preview
+                  {isPreviewMode ? 'End preview' : 'Preview'}
                 </Button>
               </div>
             </div>
@@ -175,12 +177,18 @@ export const Attributes = ({
   const [renderValues, setRenderValues] = useState<Record<string, string>>(values);
   const isEditorMode = context.isEditorMode;
   const isPreviewMode = context.isPreviewMode;
+  const setRenderValue = (key: string, value: string) => {
+    setRenderValues(prev => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
 
   return (
     <>
       {children(renderValues)}
       {isEditorMode && !isPreviewMode ? (
-        <AttributeEditor renderValues={renderValues} setRenderValues={setRenderValues} />
+        <AttributeEditor attributes={attributes} setRenderValue={setRenderValue} />
       ) : null}
     </>
   );
