@@ -40,6 +40,7 @@ const ImageInput = ({
       <div className="restw:flex! restw:gap-2! restw:mt-1!">
         <input
           type="file"
+          name={`${attrKey}.imageFile`}
           accept="image/*"
           onChange={e => {
             const file = e.target.files ? e.target.files[0] : null;

@@ -52,8 +52,8 @@ export const Content = ({ children, contentName }: ContentProps): React.ReactNod
     const button = e.target as HTMLButtonElement;
     const form = button.form;
     const formData = new FormData(form);
-    const data = Array.from(formData.entries()).reduce((res: Record<string, string>, [name, val]) => {
-      res[name] = val.toString();
+    const data = Array.from(formData.entries()).reduce((res: Record<string, string | File>, [name, val]) => {
+      res[name] = val;
       return res;
     }, {});
     const publishEvent = {
