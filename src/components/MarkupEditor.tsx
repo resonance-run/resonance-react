@@ -20,12 +20,10 @@ export const MarkupEditor = ({
   updateMarkup: (html: string) => void;
 }) => {
   const hiddenInputRef = useRef<HTMLInputElement>(null);
-  const [showMarkupEditor, setShowMarkupEditor] = useState(false);
   const [editorState, setEditorState] = useState<{ html: string; value: SerializedEditorState }>();
 
   const save = () => {
     updateMarkup(editorState.html);
-    setShowMarkupEditor(false);
     const event = new Event('change', { bubbles: true });
     hiddenInputRef?.current.dispatchEvent(event);
   };
@@ -33,19 +31,6 @@ export const MarkupEditor = ({
     <div>
       {isPreviewMode ? (
         children
-      ) : !showMarkupEditor ? (
-        <div
-          onClick={() => setShowMarkupEditor(!showMarkupEditor)}
-          style={{
-            background: 'transparent',
-            border: '1px solid rgba(0,0,0,0.7)',
-            padding: '2px 4px',
-            borderRadius: 4,
-            cursor: 'pointer',
-          }}
-        >
-          {children}
-        </div>
       ) : (
         <Suspense fallback={<div>Loading editor...</div>}>
           <div>
@@ -55,9 +40,6 @@ export const MarkupEditor = ({
             <div className="restw:flex! restw:gap-2! restw:mt-2!">
               <Button type="button" onClick={() => save()}>
                 Save
-              </Button>
-              <Button type="button" onClick={() => setShowMarkupEditor(false)}>
-                Cancel
               </Button>
             </div>
           </div>
