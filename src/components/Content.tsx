@@ -1,4 +1,4 @@
-import { createContext, FormEvent, MouseEvent, ReactNode, useContext, useEffect, useState } from 'react';
+import { createContext, FormEvent, MouseEvent, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { useResonance } from '../context/ResonanceContext.js';
 import sanitizeHtml from 'sanitize-html';
 import { StringEditor } from './StringEditor.js';
@@ -170,26 +170,39 @@ export const Attributes = ({
 }) => {
   const context = useContext(ContentContext);
   const content = context.content as Record<string, string>;
-  const values = Object.entries(attributes).reduce((acc, [key, details]) => {
-    acc[key] = content[key] ? content[key] : details.value;
-    return acc;
-  }, {} as Record<string, string>);
-  const [renderValues, setRenderValues] = useState<Record<string, string>>(values);
+  const [attributesWithOverrides, setAttributes] = useState<Record<string, AttributeDetails>>(
+    Object.entries(attributes).reduce((acc, [key, details]) => {
+      acc[key] = {
+        ...details,
+        value: content[key] ? content[key] : details.value,
+      };
+      return acc;
+    }, {} as Record<string, AttributeDetails>)
+  );
   const isEditorMode = context.isEditorMode;
   const isPreviewMode = context.isPreviewMode;
-  const setRenderValue = (key: string, value: string) => {
-    setRenderValues(prev => ({
+  const setAttributeValue = (key: string, value: string) => {
+    setAttributes(prev => ({
       ...prev,
-      [key]: value,
+      [key]: { ...prev[key], value },
     }));
   };
 
-  return (
-    <>
-      {children(renderValues)}
-      {isEditorMode && !isPreviewMode ? (
-        <AttributeEditor attributes={attributes} setRenderValue={setRenderValue} />
-      ) : null}
-    </>
+  return isEditorMode && !isPreviewMode ? (
+    <AttributeEditor attributes={attributesWithOverrides} setAttribute={setAttributeValue}>
+      {children(
+        Object.entries(attributesWithOverrides).reduce((res, [key, details]) => {
+          res[key] = details.value;
+          return res;
+        }, {} as Record<string, string>)
+      )}
+    </AttributeEditor>
+  ) : (
+    children(
+      Object.entries(attributesWithOverrides).reduce((res, [key, details]) => {
+        res[key] = details.value;
+        return res;
+      }, {} as Record<string, string>)
+    )
   );
 };
