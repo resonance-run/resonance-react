@@ -4,33 +4,34 @@ import { v4 as uuidV4 } from 'uuid';
 export const StringEditor = ({
   children,
   attribute,
+  path,
   contentName,
   isPreviewMode,
 }: {
-  attribute: string;
-  contentName: string;
   children: ReactNode;
+  attribute: string;
+  path: string;
+  contentName: string;
   isPreviewMode: boolean;
 }) => {
+  const fullAttribute = path ? `${path}.${attribute}` : attribute;
   return isPreviewMode ? (
     children
   ) : (
     <>
       <input
         type="text"
-        name={`${attribute}.value`}
+        name={`${fullAttribute}.value`}
         className="restw:p-2! restw:rounded-md! restw:w-full!"
         style={{
           background: 'transparent',
           border: '1px solid rgba(0,0,0,0.7)',
         }}
         defaultValue={children as string}
-        data-resonance-content-name={contentName}
-        data-resonance-content-attribute={attribute}
       />
-      <input type="hidden" name={`${attribute}.name`} value={attribute} />
-      <input type="hidden" name={`${attribute}.id`} value={uuidV4()} />
-      <input type="hidden" name={`${attribute}.type`} value="RawString" />
+      <input type="hidden" name={`${fullAttribute}.name`} value={attribute} />
+      <input type="hidden" name={`${fullAttribute}.id`} value={uuidV4()} />
+      <input type="hidden" name={`${fullAttribute}.type`} value="RawString" />
     </>
   );
 };
