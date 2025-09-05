@@ -2,7 +2,7 @@ import { SerializedEditorState } from 'lexical';
 import { lazy, Suspense, useRef, useState } from 'react';
 import { v4 as uuidV4 } from 'uuid';
 
-import { Button } from './common/Button.js';
+import { Button } from '../common/Button.js';
 
 const RichTextEditor = lazy(() => import('./rte/RichTextEditor.js'));
 

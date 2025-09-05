@@ -4,7 +4,7 @@ import { $createParagraphNode, $getSelection, type LexicalEditor } from 'lexical
 import { Check, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, List, Quote, Text } from 'lucide-react';
 import { useState } from 'react';
 
-import { Popover, PopoverContent, PopoverTrigger } from '../common/Popover.js';
+import { Popover, PopoverContent, PopoverTrigger } from '../../common/Popover.js';
 
 export const blockTypeToBlockName = {
   bullet: 'Bullet List',
