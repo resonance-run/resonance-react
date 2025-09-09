@@ -22,6 +22,7 @@ export const AttributeEditor = ({ attributes, path, children, setAttribute }: At
       return res;
     }, {});
   const attributeKeysToRemove = [];
+
   const traverse = child => {
     if (isValidElement(child) && 'props' in child) {
       child as ReactElement<HTMLElement>;
@@ -54,7 +55,7 @@ export const AttributeEditor = ({ attributes, path, children, setAttribute }: At
     <div>
       {enhancedChildren}
       {Object.entries(remainingAttributes).map(([attrKey, { value, type }]) => (
-        <AttributeInput key={attrKey} attrKey={attrKey} type={type} value={value} saveAttr={saveAttr} />
+        <AttributeInput path={path} key={attrKey} attrKey={attrKey} type={type} value={value} saveAttr={saveAttr} />
       ))}
     </div>
   );
@@ -64,28 +65,32 @@ const AttributeInput = ({
   attrKey,
   value,
   type,
+  path,
   saveAttr,
 }: {
   attrKey: string;
   value: string;
   type: AttributeType;
+  path: string;
   saveAttr: (key: string, value: string) => void;
 }) => {
   const [controlledValue, setControlledValue] = useState<string>(value);
+
+  const fullAttribute = path ? `${path}.${attrKey}` : attrKey;
   return (
     <label className="restw:flex! restw:flex-col!">
       <span>{attrKey}</span>
       <div className="restw:flex! restw:gap-2! restw:mt-1!">
         <input
           type="text"
-          name={`${attrKey}.value`}
+          name={`${fullAttribute}.value`}
           value={controlledValue}
           onChange={e => setControlledValue(e.target.value)}
           className="restw:border! restw:rounded-sm! restw:border-gray-300!"
         />
-        <input type="hidden" name={`${attrKey}.name`} value={attrKey} />
-        <input type="hidden" name={`${attrKey}.id`} value={v4()} />
-        <input type="hidden" name={`${attrKey}.type`} value={type} />
+        <input type="hidden" name={`${fullAttribute}.name`} value={attrKey} />
+        <input type="hidden" name={`${fullAttribute}.id`} value={v4()} />
+        <input type="hidden" name={`${fullAttribute}.type`} value={type} />
         <Button type="button" onClick={() => saveAttr(attrKey, controlledValue)}>
           Save
         </Button>
