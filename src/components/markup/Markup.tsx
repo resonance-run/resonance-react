@@ -26,7 +26,8 @@ export const Markup = ({ attribute, children }: { attribute: string; children: R
   const fullAttribute = path ? `${path}.${attribute}` : attribute;
   return isEditorMode && waited ? (
     <MarkupEditor
-      attribute={fullAttribute}
+      path={path}
+      attribute={attribute}
       contentName={contentName}
       updateMarkup={setMarkup}
       isPreviewMode={isPreviewMode}

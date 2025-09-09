@@ -44,18 +44,22 @@ export const Content = ({ children, contentName }: ContentProps): React.ReactNod
     setIsPreviewMode(true);
   };
 
-  const publish = (e: MouseEvent<HTMLButtonElement>) => {
+  const publish = () => {
     setIsPublishing(true);
-    const button = e.target as HTMLButtonElement;
-    const form = button.form;
-    const formData = new FormData(form);
-    const data = Array.from(formData.entries()).reduce((res: Record<string, string | File>, [name, val]) => {
-      res[name] = val;
-      return res;
+    const forms = document.querySelectorAll('form[data-resonance-content-form][data-resonance-has-changes="true"]');
+    const formsData = Array.from(forms).map((form: HTMLFormElement) => new FormData(form));
+    const data = formsData.reduce((acc, formData: FormData) => {
+      acc = {
+        ...acc,
+        ...Array.from(formData.entries()).reduce((res: Record<string, string | File>, [name, val]) => {
+          res[name] = val;
+          return res;
+        }, {}),
+      };
+      return acc;
     }, {});
     const publishEvent = {
       type: 'resonance-publish',
-      customizationTypeId: contentName,
       formData: data,
     };
     window.postMessage(publishEvent);
@@ -80,7 +84,11 @@ export const Content = ({ children, contentName }: ContentProps): React.ReactNod
       value={{ content, isEditorMode, isPreviewMode, contentName, path: `content.${contentName}` }}
     >
       {isEditorMode ? (
-        <form data-resonance-content-form={contentName} onChange={() => setHasChange(true)}>
+        <form
+          data-resonance-content-form={contentName}
+          data-resonance-has-changes={hasChange ? 'true' : undefined}
+          onChange={() => setHasChange(true)}
+        >
           {children}
           {hasChange ? (
             <div className="restw:fixed! restw:flex! restw:items-center! restw:justify-center! restw:top-0! restw:z-50! restw:w-screen! restw:h-16! restw:bg-white! restw:shadow-md!">

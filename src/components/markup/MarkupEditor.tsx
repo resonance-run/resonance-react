@@ -11,12 +11,14 @@ export const MarkupEditor = ({
   attribute,
   contentName,
   isPreviewMode,
+  path,
   updateMarkup,
 }: {
   children: React.ReactNode;
   attribute: string;
   contentName: string;
   isPreviewMode: boolean;
+  path: string;
   updateMarkup: (html: string) => void;
 }) => {
   const hiddenInputRef = useRef<HTMLInputElement>(null);
@@ -27,6 +29,8 @@ export const MarkupEditor = ({
     const event = new Event('change', { bubbles: true });
     hiddenInputRef?.current.dispatchEvent(event);
   };
+
+  const fullAttribute = path ? `${path}.${attribute}` : attribute;
   return (
     <div>
       {isPreviewMode ? (
@@ -50,12 +54,12 @@ export const MarkupEditor = ({
           <input
             ref={hiddenInputRef}
             type="hidden"
-            name={`${attribute}.value`}
+            name={`${fullAttribute}.value`}
             value={JSON.stringify(editorState.value)}
           />
-          <input type="hidden" name={`${attribute}.name`} value={attribute} />
-          <input type="hidden" name={`${attribute}.id`} value={uuidV4()} />
-          <input type="hidden" name={`${attribute}.type`} value="Copy" />
+          <input type="hidden" name={`${fullAttribute}.name`} value={attribute} />
+          <input type="hidden" name={`${fullAttribute}.id`} value={uuidV4()} />
+          <input type="hidden" name={`${fullAttribute}.type`} value="Copy" />
         </>
       ) : null}
     </div>
