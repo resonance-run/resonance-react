@@ -17,7 +17,8 @@ interface ListProps<T> {
 export const List = <T,>({ attribute, items, itemKey, children }: ListProps<T>) => {
   const { content, contentName, isEditorMode, isPreviewMode, path } = useContext(ContentContext);
   const [waited, setWaited] = useState<boolean>(false);
-  const [extraItems, setExtraItems] = useState<T[]>([]);
+  const resolvedItems = content[attribute] ? content[attribute] : items;
+  const [allItems, setAllItems] = useState<T[]>(resolvedItems as T[]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -26,15 +27,29 @@ export const List = <T,>({ attribute, items, itemKey, children }: ListProps<T>) 
     return () => clearTimeout(timer);
   }, []);
 
-  const resolvedItems = content[attribute] ? content[attribute] : items;
   const renderedList = Array.isArray(resolvedItems)
-    ? [...resolvedItems, ...extraItems].map((item, index) => (
+    ? [...allItems].map((item, index) => (
         <NestedContent content={item} key={item[itemKey]} path={`${attribute}.fields[${index}].data`}>
-          {isEditorMode ? <input type="hidden" name={`${path}.${attribute}.fields[${index}].id`} value={v4()} /> : null}
-          {children(item, index)}
+          {isEditorMode ? (
+            <div>
+              {children(item, index)}
+              <input type="hidden" name={`${path}.${attribute}.fields[${index}].id`} value={v4()} />
+              <Button
+                type="button"
+                onClick={() => {
+                  const newItems = allItems.filter((_, i) => i !== index);
+                  setAllItems(newItems);
+                }}
+              >
+                Remove
+              </Button>
+            </div>
+          ) : (
+            children(item, index)
+          )}
         </NestedContent>
       ))
-    : 'No items';
+    : null;
   return isEditorMode && waited ? (
     <>
       {renderedList}
@@ -42,8 +57,8 @@ export const List = <T,>({ attribute, items, itemKey, children }: ListProps<T>) 
       <input type="hidden" name={`${path}.${attribute}.type`} value="Fields" />
       <input type="hidden" name={`${path}.${attribute}.id`} value={v4()} />
       {!isPreviewMode ? (
-        <Button type="button" onClick={() => setExtraItems([...extraItems, {} as T])} disabled={isPreviewMode}>
-          Add another {attribute} item
+        <Button type="button" onClick={() => setAllItems([...allItems, {} as T])} disabled={isPreviewMode}>
+          Add another "{attribute}" item
         </Button>
       ) : null}
     </>
